@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken") ; 
 
 const UserSchema = new mongoose.Schema({
     name :{
@@ -41,11 +42,17 @@ const UserSchema = new mongoose.Schema({
             votes : {
                 type : [new mongoose.Schema({
                     upVote : Boolean ,
+                    user : mongoose.Types.ObjectId , 
                 })],
             }
         }),
     },
 }) ;
+
+UserSchema.methods.generateAuthToken = function(){
+    const token = jwt.sign({_id : this._id , name : this.name , driver:this.driver } , "oussama.bh") ;
+    return token ; 
+}
 const userModel = mongoose.model("user" , UserSchema) ; 
 
 module.exports = userModel ;

@@ -1,11 +1,10 @@
 const express =  require("express") ;
 const User = require("../models/user.js") ;
 const bcrypt = require("bcrypt") ; 
-
+const jwt = require("jsonwebtoken") ; 
 
 //Router
 const router = express.Router() ;
-
 
 router.post("/" , async (req , res)=>{
     let user ; 
@@ -39,12 +38,26 @@ router.post("/" , async (req , res)=>{
         console.log(ex) ; 
         return res.status(500).send("Something went wrong") ;
     }
-
-    
-    
-    res.send(user) ;
+    res.set("x-auth-token" ,user.generateAuthToken() ) ; 
+    res.send({status : "Done"}) ;
 });
-bcrypt.compare("oussama.bh", "$2b$10$NsMkITeM2AFsJ0Ght5.tWeDgQCJ8V5xAnHDSht17JkBaGsv1pbidy")
-    .then(a=>console.log(a)); 
+
+router.post("/auth" ,async (req,res)=>{
+    const user =await User.findOne({email : req.body.email}) ; 
+    if (!user) return res.status(404).send("User Not Found") ; 
+    const validate = await bcrypt.compare(req.body.password , user.password) ;
+    if(!validate) return res.status(403).send("wrong password") ;
+    const token = user.generateAuthToken() ; 
+    res.set("x-auth-token" , token) ; 
+    res.send({status : "loged in"}) ;
+}) ; 
+
+router.get("/me", async (req ,res)=>{
+    const token = req.get("x-auth-token") ;
+    const payload = jwt.decode(token) ;
+    res.send(payload) ; 
+})
+
+
 
 module.exports=router ; 

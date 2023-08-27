@@ -2,7 +2,8 @@ const express = require("express") ;
 const mongoose =  require("mongoose") ; 
 
 // Requiring Routes 
-const userRoute = require("./routes/users") ; 
+const userRouter = require("./routes/users") ; 
+const pickmeRouter = require("./routes/pickmes.js")
 
 //app & mongoose
 const app = express() ; 
@@ -12,7 +13,8 @@ mongoose.connect("mongodb://127.0.0.1:27017/PickMeUp")
 
 //middelware : 
 app.use(express.json()) ; 
-app.use("/api/users" , userRoute) ; 
+app.use("/api/users" , userRouter) ; 
+app.use("/api/pickme" , pickmeRouter) ;
 
 //routes
 app.get("/" , (req ,res)=>{
