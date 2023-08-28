@@ -46,6 +46,9 @@ const UserSchema = new mongoose.Schema({
                 })],
             }
         }),
+        rides : {
+            type : Number 
+        }
     },
 }) ;
 

@@ -11,7 +11,7 @@ const Pickme = mongoose.model("pickme" , new mongoose.Schema({
             }
         }),
         required : true
-    } ,
+    } , 
     from : {
         type : String ,
         required : true ,
@@ -43,7 +43,7 @@ const Pickme = mongoose.model("pickme" , new mongoose.Schema({
             }
         })
     }, 
-    vlalid : {
+    valid: {
         type: Boolean , 
         default : true 
     }
