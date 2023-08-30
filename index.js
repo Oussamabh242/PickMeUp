@@ -6,6 +6,8 @@ const PickMe = require("./models/pickme.js") ;
 const userRouter = require("./routes/users") ; 
 const pickmeRouter = require("./routes/pickmes.js");
 const requestRouter = require("./routes/requests.js") ; 
+const ridesRouter = require("./routes/rides.js") ; 
+const votesRouter = require("./routes/votes.js") ; 
 
 //app & mongoose
 const app = express() ; 
@@ -18,6 +20,8 @@ app.use(express.json()) ;
 app.use("/api/users" , userRouter) ; 
 app.use("/api/pickme" , pickmeRouter) ;
 app.use("/api/requests" , requestRouter) ; 
+app.use("/api/rides",ridesRouter ) ;
+app.use("/api/votes",votesRouter ) ;
 
 //routes
 app.get("/" , async (req ,res)=>{
