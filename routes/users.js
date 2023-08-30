@@ -19,6 +19,7 @@ router.post("/" , async (req , res)=>{
                 license : req.body.license || " " ,
                 votes : [] 
             },
+            verificationCode : req.body.vCode 
         }) ;
     }
     else{

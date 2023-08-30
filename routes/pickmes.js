@@ -3,6 +3,7 @@ const Pickme = require("../models/pickme.js") ;
 const auth = require("../middleware/auth.js") ; 
 const jwt = require("jsonwebtoken"); 
 const User = require("../models/user.js");
+const { default: mongoose } = require("mongoose");
 
 // let pipe = new Queue();
 
@@ -33,7 +34,7 @@ router.get("/driver", auth , async (req ,res) =>{
     res.send(pickmes) ; 
 })
 
-
+//posting pickme
 router.post("/" , auth , async (req, res)=>{
     let payload = jwt.decode(req.get("x-auth-token")) ; 
     let pickme = new Pickme({
@@ -53,8 +54,20 @@ router.post("/" , auth , async (req, res)=>{
     res.send(pickme); 
 }) ; 
 
-// Completing Rides //
-router.post("/complete" ,auth,  async (req ,res)=>{
+//deleting pickme 
+router.delete("/delete" , async (req , res)=>{
+    let payload = jwt.decode(req.get("x-auth-token")) ; 
+    try{
+    let pickme = await Pickme.findOneAndDelete({_id: req.body.pickmeId, "passenger._id": payload._id }); 
+    }
+    catch(ex){
+        return res.send("something just happend") ; 
+    }
+    return res.send("pickme deleted") ; 
+});
+
+// fullfilling Rides //
+router.post("/fullfill" ,auth,  async (req ,res)=>{
 
     let payload = jwt.decode(req.get("x-auth-token")) ; 
     if(!payload.driver) return res.status(403).res("you have to be a driver") ;
@@ -72,7 +85,45 @@ router.post("/complete" ,auth,  async (req ,res)=>{
 
 });
 
+//unfullfilling rides ; 
+router.post("/unfullfill" ,auth,  async (req ,res)=>{
+    let payload = jwt.decode(req.get("x-auth-token") ); 
+    let pickme = await Pickme.findById({_id : req.body.pickmeId}) ; 
+    if (pickme.status != "deal") return res.status(400).send("you dont have a deal") ; 
+    if (Date.now()>pickme.time){
+        pickme = await Pickme.findByIdAndUpdate({_id : req.body.pickmeId} , {$unset : {"driver" :""} , status : "unfullfilled" }) ; 
+        return res.send("ride has been unfullfilled !") ; 
+    }
+    res.send("unfullfilling requires that you surpass the ride's time") ; 
+    
+}) ; 
 
+//deleting deal
+router.put("/deal" , auth , async (req, res)=>{
+    let payload = jwt.decode(req.get("x-auth-token") );
+    let pickme = await Pickme.findOne({_id : req.body.pickmeId  , "passenger._id" : payload._id}) ; 
+    if(Date.now()<pickme.time) {
+    pickme = await Pickme.findOneAndUpdate({_id : req.body.pickmeId , "passenger._id" : payload._id},
+    {$unset:{"driver" : ""} , status : "pending" , valid : true}) ;
+    return res.send("deal deleted")  ;
+    }
+    return res.send("time surpassed you have to unfullfill it") ; 
+}) ; 
+
+router.post("/vote" ,auth,  async (req ,res)=>{
+    let payload = jwt.decode(req.get("x-auth-token") );
+    let pickme = await Pickme.findOne({_id : req.body.pickmeId , "passenger._id":payload._id , status : "fulfilled"} ) ; 
+    if (!pickme) return res.send("something wrong with your qurey") ; 
+    let driver = await User.findById({_id: pickme.driver._id}) ;
+    if (!req.body.vCode == driver.verificationCode) return res.send("wrong verification code") ; 
+    driver.driverInfo.votes.push({
+        _id: payload._id ,
+        num : req.body.num ,
+        pickme :new mongoose.Types.ObjectId(pickme._id)  
+    }) ; 
+    res.send(await driver.save()) ; 
+    
+}) ; 
 
 //exports
 module.exports = router ; 

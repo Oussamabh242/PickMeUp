@@ -41,8 +41,8 @@ const UserSchema = new mongoose.Schema({
             },
             votes : {
                 type : [new mongoose.Schema({
-                    upVote : Boolean ,
-                    user : mongoose.Types.ObjectId , 
+                    num : Number ,
+                    pickme : mongoose.Types.ObjectId
                 })],
             },
             rides : {
