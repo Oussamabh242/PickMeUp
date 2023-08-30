@@ -46,7 +46,8 @@ const Pickme = mongoose.model("pickme" , new mongoose.Schema({
     valid: {
         type: Boolean , 
         default : true 
-    }
+    }, 
+    
 
 
 }));

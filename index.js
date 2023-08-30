@@ -26,7 +26,7 @@ app.get("/" , async (req ,res)=>{
 
 async function edit(){
     console.log("start") ; 
-        await PickMe.updateMany({time : {$lt :Date.now()} , valid : true } , {valid :false}) ; 
+        await PickMe.updateMany({time : {$lt :Date.now()} , valid : true , status : "pending" } , {valid :false}) ; 
 }
 
 setInterval(edit, 3600000); 

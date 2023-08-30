@@ -44,12 +44,19 @@ const UserSchema = new mongoose.Schema({
                     upVote : Boolean ,
                     user : mongoose.Types.ObjectId , 
                 })],
+            },
+            rides : {
+            type : Number 
             }
         }),
-        rides : {
-            type : Number 
-        }
+        
     },
+    verificationCode :{
+        type: String ,
+        min : 6 , 
+        max : 20 , 
+        required: true
+    }
 }) ;
 
 UserSchema.methods.generateAuthToken = function(){

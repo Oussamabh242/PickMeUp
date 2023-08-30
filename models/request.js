@@ -44,6 +44,10 @@ let Request = mongoose.model('request' , new mongoose.Schema({
     status :{
         type :String  , 
         default : "pending"
+    } , 
+    valid :{
+        type : Boolean , 
+        default : true 
     }
 }));
 module.exports = Request ; 
